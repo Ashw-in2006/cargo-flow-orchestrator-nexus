@@ -1,73 +1,81 @@
-# Welcome to your Lovable project
 
-## Project info
+# Cargo Flow Orchestrator
 
-**URL**: https://lovable.dev/projects/7e595c0b-2219-4bc0-9908-444c6c0acdf1
+This application optimizes cargo placement, retrieval, and waste management with advanced algorithms.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Cargo placement optimization
+- Item search and retrieval
+- Waste management
+- Time simulation
+- Analytics dashboard
+- 3D container visualization
 
-**Use Lovable**
+## Requirements
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7e595c0b-2219-4bc0-9908-444c6c0acdf1) and start prompting.
+- Node.js (v14 or higher)
+- Docker (for containerized deployment)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Local Development
 
-**Use your preferred IDE**
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/cargo-flow-orchestrator.git
+   cd cargo-flow-orchestrator
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. Start the development server:
+   ```
+   npm run dev
+   ```
 
-Follow these steps:
+4. Open your browser and navigate to `http://localhost:8080`
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Docker Deployment
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. Build the Docker image:
+   ```
+   docker build -t cargo-flow-orchestrator .
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Run the Docker container:
+   ```
+   docker run -p 8000:8000 cargo-flow-orchestrator
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+3. Access the application at `http://localhost:8000`
 
-**Edit a file directly in GitHub**
+## API Endpoints
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The application provides the following API endpoints:
 
-**Use GitHub Codespaces**
+1. Placement Recommendations API: `/api/placement`
+2. Item Search and Retrieval API: `/api/search`, `/api/retrieve`, `/api/place`
+3. Waste Management API: `/api/waste/identify`, `/api/waste/return-plan`, `/api/waste/complete-undocking`
+4. Time Simulation API: `/api/simulate/day`
+5. Import/Export API: `/api/import/items`, `/api/import/containers`, `/api/export/arrangement`
+6. Logging API: `/api/logs`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Implementation
 
-## What technologies are used for this project?
+The application uses an advanced algorithm for cargo placement optimization that considers:
 
-This project is built with:
+- Item priority levels
+- Space efficiency
+- Access frequency
+- Weight distribution
+- Structural integrity
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Data structures implemented:
+- 3D grid representation for containers
+- Priority queues for item handling
+- Graph-based retrieval path optimization
 
-## How can I deploy this project?
+For more detailed information, please refer to the technical documentation.
 
-Simply open [Lovable](https://lovable.dev/projects/7e595c0b-2219-4bc0-9908-444c6c0acdf1) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
