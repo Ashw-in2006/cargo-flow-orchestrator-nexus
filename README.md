@@ -78,4 +78,3 @@ Data structures implemented:
 - Graph-based retrieval path optimization
 
 For more detailed information, please refer to the technical documentation.
-
