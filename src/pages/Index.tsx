@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Warehouse, Package, AlertCircle, BarChart3, Truck, Box } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import StatCard from '@/components/StatCard';
 import { getContainers, searchItems, getLogs, Container, Item, LogEntry } from '@/services/api';
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [containers, setContainers] = useState<Container[]>([]);
   const [highPriorityItems, setHighPriorityItems] = useState<Item[]>([]);
   const [wasteItems, setWasteItems] = useState<Item[]>([]);
@@ -54,6 +56,19 @@ const Index = () => {
   const totalCapacity = containers.reduce((sum, container) => sum + container.capacity, 0);
   const totalUsed = containers.reduce((sum, container) => sum + container.currentLoad, 0);
   const capacityUtilization = totalCapacity > 0 ? Math.round((totalUsed / totalCapacity) * 100) : 0;
+  
+  // Navigation handlers
+  const handleContainerClick = (container: Container) => {
+    navigate('/containers');
+  };
+  
+  const handleItemAction = (item: Item) => {
+    navigate('/placement');
+  };
+  
+  const handleProcessWaste = () => {
+    navigate('/waste');
+  };
 
   return (
     <DashboardLayout>
@@ -66,30 +81,39 @@ const Index = () => {
         <StatCard 
           title="Total Containers" 
           value={containers.length} 
-          icon={<Warehouse className="w-5 h-5 text-primary" />} 
+          icon={<Warehouse className="w-5 h-5 text-primary" />}
+          onClick={() => navigate('/containers')}
         />
         <StatCard 
           title="Total Items" 
           value={totalItems} 
-          icon={<Box className="w-5 h-5 text-primary" />} 
+          icon={<Box className="w-5 h-5 text-primary" />}
+          onClick={() => navigate('/search')}
         />
         <StatCard 
           title="High Priority Items" 
           value={highPriorityItems.length} 
-          icon={<AlertCircle className="w-5 h-5 text-primary" />} 
+          icon={<AlertCircle className="w-5 h-5 text-primary" />}
+          onClick={() => navigate('/search?priority=high')}
         />
         <StatCard 
           title="Capacity Utilization" 
           value={`${capacityUtilization}%`} 
           icon={<BarChart3 className="w-5 h-5 text-primary" />} 
           trend={{ value: 5.2, positive: true }}
+          onClick={() => navigate('/analytics')}
         />
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Container Overview</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Container Overview</span>
+              <Button variant="outline" size="sm" onClick={() => navigate('/containers')}>
+                View All Containers
+              </Button>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -99,10 +123,15 @@ const Index = () => {
                 <p>No containers found</p>
               ) : (
                 containers.map(container => (
-                  <ContainerVisualization 
-                    key={container.id} 
-                    container={container} 
-                  />
+                  <div 
+                    key={container.id}
+                    onClick={() => handleContainerClick(container)}
+                    className="cursor-pointer hover:scale-105 transition-transform"
+                  >
+                    <ContainerVisualization 
+                      container={container} 
+                    />
+                  </div>
                 ))
               )}
             </div>
@@ -116,7 +145,11 @@ const Index = () => {
             title="High Priority Items" 
             items={highPriorityItems} 
             actions={(item) => (
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleItemAction(item)}
+              >
                 <Package className="h-4 w-4 mr-1" />
                 Place
               </Button>
@@ -147,7 +180,7 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   {wasteItems.length} waste items identified for processing
                 </p>
-                <Button>Process Waste Items</Button>
+                <Button onClick={handleProcessWaste}>Process Waste Items</Button>
               </div>
             )}
           </CardContent>
