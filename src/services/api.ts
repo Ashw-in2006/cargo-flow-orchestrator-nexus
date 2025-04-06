@@ -97,26 +97,206 @@ export interface LogEntry {
   userId?: string;
 }
 
-// API Endpoints
+// Mock data for development purposes
+const mockContainers: Container[] = [
+  {
+    id: "c001",
+    name: "Container A",
+    dimensions: { width: 10, height: 8, depth: 20 },
+    capacity: 1600,
+    currentLoad: 850,
+    items: []
+  },
+  {
+    id: "c002",
+    name: "Container B",
+    dimensions: { width: 12, height: 10, depth: 15 },
+    capacity: 1800,
+    currentLoad: 1200,
+    items: []
+  },
+  {
+    id: "c003",
+    name: "Container C",
+    dimensions: { width: 8, height: 6, depth: 12 },
+    capacity: 576,
+    currentLoad: 300,
+    items: []
+  }
+];
+
+const mockItems: Item[] = [
+  {
+    id: "i001",
+    name: "Medical Supplies",
+    dimensions: { width: 2, height: 1, depth: 3 },
+    weight: 5,
+    priority: "high",
+    containerId: "c001",
+    position: { x: 0, y: 0, z: 0 },
+    category: "Medical"
+  },
+  {
+    id: "i002",
+    name: "Food Rations",
+    dimensions: { width: 4, height: 2, depth: 3 },
+    weight: 10,
+    priority: "high",
+    containerId: "c001",
+    position: { x: 2, y: 0, z: 0 },
+    category: "Food",
+    expiryDate: "2025-06-01"
+  },
+  {
+    id: "i003",
+    name: "Scientific Equipment",
+    dimensions: { width: 3, height: 3, depth: 4 },
+    weight: 15,
+    priority: "medium",
+    containerId: "c002",
+    position: { x: 0, y: 0, z: 3 },
+    category: "Science"
+  },
+  {
+    id: "i004",
+    name: "Maintenance Tools",
+    dimensions: { width: 2, height: 1, depth: 2 },
+    weight: 8,
+    priority: "medium",
+    containerId: "c002",
+    position: { x: 3, y: 0, z: 3 },
+    category: "Maintenance"
+  },
+  {
+    id: "i005",
+    name: "Personal Items",
+    dimensions: { width: 1, height: 1, depth: 1 },
+    weight: 2,
+    priority: "low",
+    containerId: "c003",
+    position: { x: 0, y: 0, z: 7 },
+    category: "Personal"
+  },
+  {
+    id: "i006",
+    name: "Waste Package",
+    dimensions: { width: 1, height: 1, depth: 1 },
+    weight: 3,
+    priority: "low",
+    containerId: "c003",
+    position: { x: 1, y: 0, z: 7 },
+    category: "Waste",
+    isWaste: true
+  }
+];
+
+const mockLogs: LogEntry[] = [
+  {
+    id: "l001",
+    timestamp: "2025-04-06T09:30:00Z",
+    operation: "ITEM_PLACED",
+    details: {
+      itemId: "i001",
+      containerId: "c001",
+      position: { x: 0, y: 0, z: 0 }
+    }
+  },
+  {
+    id: "l002",
+    timestamp: "2025-04-06T10:15:00Z",
+    operation: "ITEM_PLACED",
+    details: {
+      itemId: "i002",
+      containerId: "c001",
+      position: { x: 2, y: 0, z: 0 }
+    }
+  },
+  {
+    id: "l003",
+    timestamp: "2025-04-06T11:45:00Z",
+    operation: "ITEM_RETRIEVED",
+    details: {
+      itemId: "i001",
+      containerId: "c001"
+    }
+  },
+  {
+    id: "l004",
+    timestamp: "2025-04-06T13:20:00Z",
+    operation: "ITEM_PLACED",
+    details: {
+      itemId: "i001",
+      containerId: "c001",
+      position: { x: 0, y: 0, z: 0 }
+    }
+  }
+];
+
+// API functions that would normally connect to a backend
 
 // Get all containers
 export async function getContainers(): Promise<Container[]> {
-  return apiRequest<Container[]>('/containers');
+  // In a real app, this would be:
+  // return apiRequest<Container[]>('/containers');
+  
+  // For now, we'll return mock data
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockContainers), 300);
+  });
 }
 
 // Get container by ID
 export async function getContainerById(id: string): Promise<Container> {
-  return apiRequest<Container>(`/containers/${id}`);
+  // In a real app, this would be:
+  // return apiRequest<Container>(`/containers/${id}`);
+  
+  // For now, we'll return mock data
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const container = mockContainers.find(c => c.id === id);
+      if (container) {
+        // Add items to the container
+        const containerItems = mockItems.filter(item => item.containerId === id);
+        resolve({
+          ...container,
+          items: containerItems
+        });
+      } else {
+        reject(new Error("Container not found"));
+      }
+    }, 300);
+  });
 }
 
 // Get placement recommendations
 export async function getPlacementRecommendations(
   itemId: string
 ): Promise<PlacementRecommendation[]> {
-  return apiRequest<PlacementRecommendation[]>('/placement', {
-    method: 'POST',
-    body: JSON.stringify({ items: [itemId] })
-  }).then(response => response.placements || []);
+  // In a real app, this would be:
+  // return apiRequest<PlacementRecommendation[]>(`/placement?itemId=${itemId}`);
+  
+  // For now, we'll return mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Simple algorithm - recommend containers with the most space
+      const recommendations = mockContainers
+        .sort((a, b) => (a.currentLoad / a.capacity) - (b.currentLoad / b.capacity))
+        .slice(0, 2)
+        .map((container, index) => ({
+          itemId,
+          containerId: container.id,
+          position: { x: index, y: 0, z: index },
+          priorityScore: 100 - ((container.currentLoad / container.capacity) * 100),
+          reasonings: [
+            "Container has available space",
+            "Placement optimizes for future retrievals",
+            "Position minimizes rearrangement needs"
+          ]
+        }));
+      
+      resolve(recommendations);
+    }, 500);
+  });
 }
 
 // Search for items
@@ -128,52 +308,112 @@ export async function searchItems(
     isWaste?: boolean 
   }
 ): Promise<SearchResult> {
-  const searchParams = new URLSearchParams();
+  // In a real app, this would be:
+  // return apiRequest<SearchResult>(`/search?query=${encodeURIComponent(query)}&${new URLSearchParams(filters)}`);
   
-  if (query) {
-    searchParams.append('query', query);
-  }
-  
-  if (filters) {
-    if (filters.category) {
-      searchParams.append('category', filters.category);
-    }
-    
-    if (filters.priority) {
-      searchParams.append('priority', filters.priority);
-    }
-    
-    if (filters.isWaste !== undefined) {
-      searchParams.append('isWaste', filters.isWaste.toString());
-    }
-  }
-  
-  return apiRequest<SearchResult>(`/search?${searchParams.toString()}`);
+  // For now, we'll return filtered mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      let filteredItems = [...mockItems];
+      
+      // Apply text search
+      if (query) {
+        const queryLower = query.toLowerCase();
+        filteredItems = filteredItems.filter(
+          item => item.name.toLowerCase().includes(queryLower) || 
+                 item.category.toLowerCase().includes(queryLower)
+        );
+      }
+      
+      // Apply filters
+      if (filters) {
+        if (filters.category) {
+          filteredItems = filteredItems.filter(
+            item => item.category.toLowerCase() === filters.category?.toLowerCase()
+          );
+        }
+        
+        if (filters.priority) {
+          filteredItems = filteredItems.filter(
+            item => item.priority === filters.priority
+          );
+        }
+        
+        if (filters.isWaste !== undefined) {
+          filteredItems = filteredItems.filter(
+            item => item.isWaste === filters.isWaste
+          );
+        }
+      }
+      
+      resolve({
+        items: filteredItems,
+        totalResults: filteredItems.length
+      });
+    }, 300);
+  });
 }
 
 // Get logs
 export async function getLogs(limit: number = 10): Promise<LogEntry[]> {
-  return apiRequest<{ success: boolean, logs: LogEntry[] }>(`/logs?limit=${limit}`)
-    .then(response => response.logs || []);
+  // In a real app, this would be:
+  // return apiRequest<LogEntry[]>(`/logs?limit=${limit}`);
+  
+  // For now, we'll return mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockLogs.slice(0, limit));
+    }, 300);
+  });
 }
 
 // Identify waste items
 export async function identifyWasteItems(): Promise<WasteItem[]> {
-  return apiRequest<{ success: boolean, items: WasteItem[] }>('/waste/identify')
-    .then(response => response.items || []);
+  // In a real app, this would be:
+  // return apiRequest<WasteItem[]>('/waste/identify');
+  
+  // For now, we'll return mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const wasteItems = mockItems.filter(item => item.isWaste) as WasteItem[];
+      resolve(wasteItems);
+    }, 300);
+  });
 }
 
 // Simulate day
-export async function simulateDay(days: number = 1): Promise<{ 
+export async function simulateDay(): Promise<{ 
   success: boolean; 
   changes: Array<{ type: string; details: any }>
 }> {
-  return apiRequest<{ 
-    success: boolean; 
-    changes: Array<{ type: string; details: any }> 
-  }>('/simulate/day', { 
-    method: 'POST',
-    body: JSON.stringify({ days })
+  // In a real app, this would be:
+  // return apiRequest<{ success: boolean; changes: Array<{ type: string; details: any }> }>('/simulate/day', { method: 'POST' });
+  
+  // For now, we'll return mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        changes: [
+          {
+            type: "ITEM_EXPIRY",
+            details: {
+              itemId: "i002",
+              name: "Food Rations",
+              expiryDate: "2025-05-01"
+            }
+          },
+          {
+            type: "WASTE_ADDED",
+            details: {
+              itemId: "i007",
+              name: "New Waste Package",
+              category: "Waste"
+            }
+          }
+        ]
+      });
+    }, 1000);
   });
 }
 
@@ -183,9 +423,17 @@ export async function placeItem(
   containerId: string, 
   position: { x: number; y: number; z: number }
 ): Promise<{ success: boolean }> {
-  return apiRequest<{ success: boolean }>('/place', {
-    method: 'POST',
-    body: JSON.stringify({ itemId, containerId, position })
+  // In a real app, this would be:
+  // return apiRequest<{ success: boolean }>('/place', {
+  //   method: 'POST',
+  //   body: JSON.stringify({ itemId, containerId, position })
+  // });
+  
+  // For now, we'll return mock success
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ success: true });
+    }, 500);
   });
 }
 
@@ -193,88 +441,21 @@ export async function placeItem(
 export async function retrieveItem(
   itemId: string
 ): Promise<{ success: boolean; rearrangements?: Array<{ itemId: string; newPosition: { x: number; y: number; z: number } }> }> {
-  return apiRequest<{ 
-    success: boolean; 
-    rearrangements?: Array<{ 
-      itemId: string; 
-      newPosition: { x: number; y: number; z: number } 
-    }> 
-  }>('/retrieve', { 
-    method: 'POST',
-    body: JSON.stringify({ itemId })
+  // In a real app, this would be:
+  // return apiRequest<{ success: boolean; rearrangements?: Array<{ itemId: string; newPosition: { x: number; y: number; z: number } }> }>(`/retrieve/${itemId}`, { method: 'POST' });
+  
+  // For now, we'll return mock success
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ 
+        success: true,
+        rearrangements: [
+          {
+            itemId: "i003",
+            newPosition: { x: 2, y: 0, z: 3 }
+          }
+        ]
+      });
+    }, 500);
   });
-}
-
-// Export current arrangement
-export async function exportArrangement(): Promise<any> {
-  return apiRequest<any>('/export/arrangement');
-}
-
-// Import items
-export async function importItems(items: Partial<Item>[]): Promise<{ success: boolean; count: number }> {
-  return apiRequest<{ success: boolean; count: number }>('/import/items', {
-    method: 'POST',
-    body: JSON.stringify({ items })
-  });
-}
-
-// Import containers
-export async function importContainers(containers: Partial<Container>[]): Promise<{ success: boolean; count: number }> {
-  return apiRequest<{ success: boolean; count: number }>('/import/containers', {
-    method: 'POST',
-    body: JSON.stringify({ containers })
-  });
-}
-
-// Waste management - get return plan
-export async function getWasteReturnPlan(itemIds: string[]): Promise<any> {
-  return apiRequest<any>('/waste/return-plan', {
-    method: 'POST',
-    body: JSON.stringify({ itemIds })
-  });
-}
-
-// Waste management - complete undocking
-export async function completeWasteUndocking(operationId: string): Promise<{ success: boolean }> {
-  return apiRequest<{ success: boolean }>('/waste/complete-undocking', {
-    method: 'POST',
-    body: JSON.stringify({ operationId })
-  });
-}
-
-// Analytics data functions
-export async function getAnalyticsData(): Promise<{
-  spaceUtilization: { percentage: number; trend: number };
-  itemCounts: { priority: string; count: number }[];
-  wasteGeneration: { period: string; amount: number }[];
-  categoryDistribution: { name: string; value: number }[];
-  containerCapacity: { name: string; capacity: number; used: number }[];
-}> {
-  // In a real app, this would be an API call
-  return {
-    spaceUtilization: { percentage: 74.3, trend: 5.2 },
-    itemCounts: [
-      { priority: 'High', count: 12 },
-      { priority: 'Medium', count: 25 },
-      { priority: 'Low', count: 18 },
-    ],
-    wasteGeneration: [
-      { period: 'Week 1', amount: 5 },
-      { period: 'Week 2', amount: 7 },
-      { period: 'Week 3', amount: 3 },
-      { period: 'Week 4', amount: 9 },
-    ],
-    categoryDistribution: [
-      { name: 'Medical', value: 25 },
-      { name: 'Food', value: 30 },
-      { name: 'Science', value: 15 },
-      { name: 'Maintenance', value: 20 },
-      { name: 'Personal', value: 10 },
-    ],
-    containerCapacity: [
-      { name: 'Container A', capacity: 1600, used: 1200 },
-      { name: 'Container B', capacity: 1800, used: 900 },
-      { name: 'Container C', capacity: 576, used: 400 },
-    ],
-  };
 }
